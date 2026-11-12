@@ -8,10 +8,10 @@ Built with Expo, React Native, TypeScript and Expo Router for Application Develo
 
 ## Screens
 
-- **Home** - the verdict for the selected city, with the temperature, rain chance and wind. It reloads every time you open it.
-- **Hourly forecast** - the next 24 hours in a list: time, temperature, rain chance and wind.
+- **Home** - the verdict for the selected city, with the temperature, rain chance and wind. It reloads every time you open it. The background color follows the verdict, and the heart button saves or removes the city from your favourites.
+- **Hourly forecast** - the next 24 hours in a list: time, temperature, rain chance and wind. Each row has a color bar with the verdict for that hour.
 - **Search city** - a form with validation (empty input, city not found, no connection). Tap a result to make it the selected city.
-- **Favourites** - the saved cities. Tap one to open it on Home, or remove it.
+- **Favourites** - the saved cities as photo cards. Tap one to open it on Home. You can add your own photo (camera or gallery) or delete the city.
 
 ## The verdict rule
 
@@ -19,24 +19,31 @@ Built with Expo, React Native, TypeScript and Expo Router for Application Develo
 - **Walk** when the wind is above 30 km/h
 - **Ride** otherwise
 
-## API
+## APIs
 
-[Open-Meteo](https://open-meteo.com). No API key and no login:
+No API key and no login for any of them:
 
-- Forecast: `https://api.open-meteo.com/v1/forecast` (current weather and hourly forecast)
-- Geocoding: `https://geocoding-api.open-meteo.com/v1/search` (city search)
+- [Open-Meteo](https://open-meteo.com) forecast: `https://api.open-meteo.com/v1/forecast` (current weather and hourly forecast)
+- [Open-Meteo](https://open-meteo.com) geocoding: `https://geocoding-api.open-meteo.com/v1/search` (city search)
+- [Picsum Photos](https://picsum.photos): a random photo for each city. If it cannot load, the app shows a soft color with a weather icon instead.
 
 Every screen that loads data shows a loading state and an error message.
 
 ## Local storage
 
-Favourite cities are saved on the device with `expo-sqlite`, so they are still there after the app is closed. There is no server.
+Favourite cities, and the photo you add to each one, are saved on the device with `expo-sqlite`, so they are still there after the app is closed. There is no server.
+
+## Device capability
+
+The camera and the photo gallery, with `expo-image-picker`. The app asks for the camera permission first and shows a message if it is refused.
 
 ## Project structure
 
 ```
-src/app/        screens (Expo Router): index, hourly, search, favourites
-src/lib/        api.ts (fetch), storage.ts (SQLite), cities-context.tsx (selected city and favourites), verdict.ts, types.ts
+src/app/         screens (Expo Router): index, hourly, search, favourites
+src/components/  app-button.tsx, city-photo.tsx
+src/lib/         api.ts (fetch), storage.ts (SQLite), cities-context.tsx (selected city and favourites),
+                 verdict.ts, theme.ts, types.ts
 ```
 
 ## Run it

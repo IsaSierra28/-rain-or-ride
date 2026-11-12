@@ -3,12 +3,13 @@ import { router } from "expo-router";
 import { Tabs } from "expo-router/js-tabs";
 import { Pressable } from "react-native";
 import { CitiesProvider } from "../lib/cities-context";
+import { colors } from "../lib/theme";
 
 // Back arrow for the screens that are not tabs (Search city, Hourly forecast)
 function backArrow() {
     return (
         <Pressable onPress={() => router.back()} style={{ paddingHorizontal: 16 }}>
-            <Ionicons name="arrow-back" size={24} color="#1e88e5" />
+            <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </Pressable>
     );
 }
@@ -16,11 +17,23 @@ function backArrow() {
 export default function TabLayout() {
     return (
         <CitiesProvider>
-            <Tabs screenOptions={{ tabBarActiveTintColor: "#1e88e5" }}>
+            <Tabs
+                screenOptions={{
+                    tabBarActiveTintColor: colors.primary,
+                    headerTintColor: colors.text,
+                    headerTitleStyle: { fontWeight: "700" },
+                    headerShadowVisible: false,
+                    headerStyle: { backgroundColor: colors.background },
+                    sceneStyle: { backgroundColor: colors.background },
+                    tabBarStyle: { backgroundColor: colors.card, borderTopWidth: 0, elevation: 12 },
+                    tabBarLabelStyle: { fontWeight: "600" },
+                }}
+            >
                 <Tabs.Screen
                     name="index"
                     options={{
                         title: "Home",
+                        headerShown: false,
                         tabBarIcon: ({ color, size }) => (
                             <Ionicons name="bicycle" color={color} size={size} />
                         ),

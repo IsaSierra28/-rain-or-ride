@@ -1,8 +1,11 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
+import { AppButton } from "../components/app-button";
 import { getHourlyForecast, HourlyRow } from "../lib/api";
 import { useCities } from "../lib/cities-context";
+import { colors, verdictColors } from "../lib/theme";
+import { getVerdict } from "../lib/verdict";
 
 export default function Hourly() {
     const { selectedCity } = useCities();
@@ -31,7 +34,7 @@ export default function Hourly() {
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator size="large" />
+                <ActivityIndicator size="large" color={colors.primary} />
                 <Text style={styles.note}>Loading...</Text>
             </View>
         );
@@ -41,42 +44,67 @@ export default function Hourly() {
         return (
             <View style={styles.center}>
                 <Text style={styles.note}>{error}</Text>
-                <Button title="Back to Home" onPress={() => router.navigate("/")} />
+                <AppButton title="Back to Home" onPress={() => router.navigate("/")} />
             </View>
         );
     }
 
     return (
         <FlatList
+            style={styles.screen}
             data={rows}
             keyExtractor={(item) => item.time}
             contentContainerStyle={styles.list}
-            ListHeaderComponent={<Text style={styles.title}>{selectedCity.name}: next 24 hours</Text>}
-            renderItem={({ item }) => (
-                <View style={styles.row}>
-                    <Text style={styles.time}>{item.time.slice(11, 16)}</Text>
-                    <Text style={styles.value}>{item.temperature} °C</Text>
-                    <Text style={styles.value}>{item.rainChance}%</Text>
-                    <Text style={styles.value}>{item.wind} km/h</Text>
+            ListHeaderComponent={
+                <View>
+                    <Text style={styles.title}>{selectedCity.name}: next 24 hours</Text>
+                    <View style={styles.headerRow}>
+                        <Text style={[styles.headerText, styles.time]}>Time</Text>
+                        <Text style={styles.headerText}>Temp</Text>
+                        <Text style={styles.headerText}>Rain</Text>
+                        <Text style={styles.headerText}>Wind</Text>
+                    </View>
                 </View>
-            )}
+            }
+            renderItem={({ item }) => {
+                const verdict = getVerdict(item.rainChance, item.wind);
+                return (
+                    <View style={[styles.row, { borderLeftColor: verdictColors[verdict] }]}>
+                        <Text style={[styles.value, styles.time]}>{item.time.slice(11, 16)}</Text>
+                        <Text style={styles.value}>{item.temperature} °C</Text>
+                        <Text style={styles.value}>{item.rainChance}%</Text>
+                        <Text style={styles.value}>{item.wind} km/h</Text>
+                    </View>
+                );
+            }}
             ListEmptyComponent={<Text style={styles.note}>No forecast available.</Text>}
         />
     );
 }
 
 const styles = StyleSheet.create({
-    center: { flex: 1, padding: 24, gap: 8, justifyContent: "center", alignItems: "center" },
+    screen: { backgroundColor: colors.background },
+    center: {
+        flex: 1,
+        padding: 24,
+        gap: 12,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: colors.background,
+    },
     list: { padding: 16, gap: 8 },
-    title: { fontSize: 18, fontWeight: "600", marginBottom: 8 },
+    title: { fontSize: 20, fontWeight: "600", color: colors.text, marginBottom: 12 },
+    headerRow: { flexDirection: "row", paddingHorizontal: 16, paddingBottom: 4 },
+    headerText: { flex: 1, textAlign: "right", fontSize: 12, color: colors.muted },
     row: {
         flexDirection: "row",
-        justifyContent: "space-between",
-        padding: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
         borderRadius: 12,
-        backgroundColor: "#f2f6fb",
+        backgroundColor: colors.card,
+        borderLeftWidth: 6,
     },
-    time: { fontSize: 16, fontWeight: "600", width: 60 },
-    value: { fontSize: 16, flex: 1, textAlign: "right" },
-    note: { color: "#666", textAlign: "center" },
+    time: { textAlign: "left", fontWeight: "600" },
+    value: { flex: 1, fontSize: 16, textAlign: "right", color: colors.text },
+    note: { color: colors.muted, textAlign: "center" },
 });

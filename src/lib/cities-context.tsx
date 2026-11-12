@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { deleteFavourite, loadFavourites, saveFavourite } from "./storage";
+import { deleteFavourite, loadFavourites, saveFavourite, saveFavouritePhoto } from "./storage";
 import { City } from "./types";
 
 type CitiesValue = {
@@ -8,6 +8,7 @@ type CitiesValue = {
     favourites: City[];
     addFavourite: (city: City) => Promise<void>;
     removeFavourite: (id: string) => Promise<void>;
+    setPhoto: (id: string, photoUri?: string) => Promise<void>;
 };
 
 const CitiesContext = createContext<CitiesValue | null>(null);
@@ -47,9 +48,24 @@ export function CitiesProvider({ children }: { children: ReactNode }) {
         setFavourites((current) => current.filter((city) => city.id !== id));
     }
 
+    // Leaving out photoUri takes the photo off
+    async function setPhoto(id: string, photoUri?: string) {
+        await saveFavouritePhoto(id, photoUri);
+        setFavourites((current) =>
+            current.map((city) => (city.id === id ? { ...city, photoUri } : city)),
+        );
+    }
+
     return (
         <CitiesContext.Provider
-            value={{ selectedCity, setSelectedCity, favourites, addFavourite, removeFavourite }}
+            value={{
+                selectedCity,
+                setSelectedCity,
+                favourites,
+                addFavourite,
+                removeFavourite,
+                setPhoto,
+            }}
         >
             {children}
         </CitiesContext.Provider>

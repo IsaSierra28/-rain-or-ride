@@ -1,17 +1,10 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-    ActivityIndicator,
-    Button,
-    FlatList,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-} from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { AppButton } from "../components/app-button";
 import { searchCities } from "../lib/api";
 import { useCities } from "../lib/cities-context";
+import { colors } from "../lib/theme";
 import { City } from "../lib/types";
 
 export default function SearchCity() {
@@ -54,17 +47,21 @@ export default function SearchCity() {
                 value={name}
                 onChangeText={setName}
                 placeholder="City name"
-                style={styles.input}
+                placeholderTextColor={colors.muted}
+                style={[styles.input, error ? styles.inputError : null]}
             />
             {error ? <Text style={styles.error}>{error}</Text> : null}
-            <Button title="Search" onPress={handleSearch} />
-            {loading && <ActivityIndicator />}
+            <AppButton title="Search" onPress={handleSearch} />
+            {loading && <ActivityIndicator color={colors.primary} />}
             <FlatList
                 data={results}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.list}
                 renderItem={({ item }) => (
-                    <Pressable style={styles.row} onPress={() => chooseCity(item)}>
+                    <Pressable
+                        style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+                        onPress={() => chooseCity(item)}
+                    >
                         <Text style={styles.name}>{item.name}</Text>
                         <Text style={styles.country}>{item.country}</Text>
                     </Pressable>
@@ -75,17 +72,27 @@ export default function SearchCity() {
 }
 
 const styles = StyleSheet.create({
-    screen: { flex: 1, padding: 16, gap: 12 },
+    screen: { flex: 1, padding: 20, gap: 12, backgroundColor: colors.background },
     input: {
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 8,
-        padding: 12,
+        borderWidth: 1.5,
+        borderColor: colors.border,
+        backgroundColor: colors.card,
+        borderRadius: 12,
+        padding: 14,
         fontSize: 16,
+        color: colors.text,
     },
-    error: { color: "#c62828" },
-    list: { gap: 8 },
-    row: { padding: 16, borderRadius: 12, backgroundColor: "#f2f6fb" },
-    name: { fontSize: 18, fontWeight: "600" },
-    country: { color: "#666" },
+    inputError: { borderColor: colors.danger },
+    error: { color: colors.danger },
+    list: { gap: 10, paddingTop: 4 },
+    row: {
+        padding: 16,
+        borderRadius: 16,
+        backgroundColor: colors.card,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    pressed: { opacity: 0.7 },
+    name: { fontSize: 18, fontWeight: "600", color: colors.text },
+    country: { color: colors.muted },
 });
