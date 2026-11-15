@@ -1,6 +1,8 @@
 import * as SQLite from "expo-sqlite";
 import { City } from "./types";
 
+// All the SQLite code is in this file: the screens never write SQL.
+// One row of the favourites table, as SQLite returns it (empty values come back as null)
 type FavouriteRow = {
     id: string;
     name: string;
@@ -36,6 +38,7 @@ function getDb() {
     return dbPromise;
 }
 
+// Reads every saved city. ORDER BY rowid keeps the order in which they were saved.
 export async function loadFavourites(): Promise<City[]> {
     const db = await getDb();
     const rows = await db.getAllAsync<FavouriteRow>("SELECT * FROM favourites ORDER BY rowid");
@@ -49,6 +52,8 @@ export async function loadFavourites(): Promise<City[]> {
     }));
 }
 
+// The ? are placeholders: the values are sent separately, so user input cannot change the SQL.
+// INSERT OR IGNORE skips the city if its id already exists, so there are no duplicates.
 export async function saveFavourite(city: City) {
     const db = await getDb();
     await db.runAsync(
@@ -62,6 +67,8 @@ export async function saveFavourite(city: City) {
     );
 }
 
+// photoUri is the path of a picture on the phone (a string). Passing undefined saves null,
+// which removes the photo.
 export async function saveFavouritePhoto(id: string, photoUri?: string) {
     const db = await getDb();
     await db.runAsync("UPDATE favourites SET photo_uri = ? WHERE id = ?", photoUri ?? null, id);

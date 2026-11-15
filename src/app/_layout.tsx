@@ -14,8 +14,11 @@ function backArrow() {
     );
 }
 
+// _layout.tsx is the frame of the app: it is not a screen. Every file in src/app is a
+// screen (index = Home, favourites, search, hourly). Nothing needs to be registered.
 export default function TabLayout() {
     return (
+        // The provider goes above the tabs, so every screen can use useCities()
         <CitiesProvider>
             <Tabs
                 screenOptions={{
@@ -48,6 +51,8 @@ export default function TabLayout() {
                         ),
                     }}
                 />
+                {/* href: null hides these two from the tab bar, but the routes still work.
+                    They open from Home and have a back arrow (the pattern from the course) */}
                 <Tabs.Screen
                     name="search"
                     options={{ href: null, title: "Search city", headerLeft: backArrow }}

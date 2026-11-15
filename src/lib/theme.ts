@@ -1,5 +1,6 @@
 import { Verdict } from "./verdict";
 
+// Colors and shadows used by every screen, so the look can be changed in one place
 export const colors = {
     background: "#f1f5fa",
     softBlue: "#e3effc",

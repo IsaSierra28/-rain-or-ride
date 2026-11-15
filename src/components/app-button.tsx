@@ -7,6 +7,7 @@ type Props = {
     variant?: "primary" | "outline";
 };
 
+// One reusable button for every screen, so all the buttons look the same
 export function AppButton({ title, onPress, variant = "primary" }: Props) {
     const outline = variant === "outline";
     return (

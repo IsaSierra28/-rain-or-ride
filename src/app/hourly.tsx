@@ -13,7 +13,8 @@ export default function Hourly() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // Runs every time this screen comes into view, and again if the city changes
+    // Same pattern as Home: loads every time the screen comes into view, and again
+    // if the city changes. load() has try / catch / finally for the error and loading states.
     useFocusEffect(
         useCallback(() => {
             async function load() {
@@ -53,6 +54,7 @@ export default function Hourly() {
         <FlatList
             style={styles.screen}
             data={rows}
+            // Every row needs a unique key. The hour never repeats, so it is the key
             keyExtractor={(item) => item.time}
             contentContainerStyle={styles.list}
             ListHeaderComponent={
@@ -67,7 +69,9 @@ export default function Hourly() {
                 </View>
             }
             renderItem={({ item }) => {
+                // The same rule as Home, applied to each hour (it decides the dot color)
                 const verdict = getVerdict(item.rainChance, item.wind);
+                // item.time looks like "2026-11-12T14:00"; slice(11, 16) keeps only "14:00"
                 return (
                     <View style={[styles.row, { borderLeftColor: verdictColors[verdict] }]}>
                         <Text style={[styles.value, styles.time]}>{item.time.slice(11, 16)}</Text>

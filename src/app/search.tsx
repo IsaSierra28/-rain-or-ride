@@ -14,6 +14,8 @@ export default function SearchCity() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    // The validated form. An empty field shows an error and never calls the API.
+    // Other errors: the city was not found, or there is no connection (the catch below).
     async function handleSearch() {
         if (!name.trim()) {
             setError("Type a city name.");
@@ -34,6 +36,8 @@ export default function SearchCity() {
         }
     }
 
+    // Saves the chosen city in the provider (all screens see it), clears the form and
+    // goes back to Home, which loads the weather for the new city.
     function chooseCity(city: City) {
         setSelectedCity(city);
         setName("");

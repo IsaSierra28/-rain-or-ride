@@ -15,6 +15,8 @@ export default function Favourites() {
         router.navigate("/");
     }
 
+    // Camera steps: 1) ask for permission, 2) open the camera, 3) check the user did not
+    // cancel, 4) save the uri. The uri is the path of the picture on the phone (a string).
     async function takePhoto(cityId: string) {
         const permission = await ImagePicker.requestCameraPermissionsAsync();
         if (!permission.granted) {
@@ -31,6 +33,7 @@ export default function Favourites() {
         }
     }
 
+    // Same idea as takePhoto, but the picture comes from the gallery
     async function pickPhoto(cityId: string) {
         const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"] });
         if (!result.canceled) {
@@ -50,6 +53,7 @@ export default function Favourites() {
         <FlatList
             style={styles.screen}
             data={favourites}
+            // The city id is unique, so it is the key of each card
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
             renderItem={({ item }) => (

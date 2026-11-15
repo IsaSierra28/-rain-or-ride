@@ -11,8 +11,11 @@ type CitiesValue = {
     setPhoto: (id: string, photoUri?: string) => Promise<void>;
 };
 
+// A context shares data with every screen without passing props from screen to screen.
+// The provider below holds the data; any screen reads it with the useCities() hook.
 const CitiesContext = createContext<CitiesValue | null>(null);
 
+// The city shown the first time the app opens
 const startingCity: City = {
     id: "montreal",
     name: "Montreal",
@@ -21,6 +24,8 @@ const startingCity: City = {
     longitude: -73.6,
 };
 
+// _layout.tsx wraps the tabs in this provider, so every screen sees the same selected
+// city and the same favourites. State inside one screen would be private to that screen.
 export function CitiesProvider({ children }: { children: ReactNode }) {
     const [selectedCity, setSelectedCity] = useState<City>(startingCity);
     const [favourites, setFavourites] = useState<City[]>([]);
@@ -40,6 +45,7 @@ export function CitiesProvider({ children }: { children: ReactNode }) {
     // Each change is written to the database, then the state is updated
     async function addFavourite(city: City) {
         await saveFavourite(city);
+        // (current) => ... uses the latest list, even if two changes happen very close together
         setFavourites((current) => [...current, city]);
     }
 
@@ -72,6 +78,7 @@ export function CitiesProvider({ children }: { children: ReactNode }) {
     );
 }
 
+// The hook every screen uses. It throws a clear error if a screen is outside the provider.
 export function useCities() {
     const value = useContext(CitiesContext);
     if (!value) throw new Error("useCities must be used inside CitiesProvider");

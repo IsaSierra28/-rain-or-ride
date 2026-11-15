@@ -24,9 +24,12 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // Runs every time Home comes into view, and again if the city changes
+    // useFocusEffect runs every time Home comes into view. A normal useEffect would only
+    // run when the city changes, because tabs stay mounted. useCallback keeps the same
+    // function between renders, so the effect does not restart by itself.
     useFocusEffect(
         useCallback(() => {
+            // The function given to an effect cannot be async, so the async work is in load()
             async function load() {
                 setLoading(true);
                 setError("");
@@ -35,6 +38,7 @@ export default function Home() {
                 } catch {
                     setError("Could not load the weather. Check your internet connection and try again.");
                 } finally {
+                    // finally always runs, so the spinner stops even when there is an error
                     setLoading(false);
                 }
             }
@@ -42,6 +46,7 @@ export default function Home() {
         }, [selectedCity]),
     );
 
+    // Three possible screens: loading, error, and the real result below
     if (loading) {
         return (
             <View style={styles.center}>
@@ -62,7 +67,9 @@ export default function Home() {
     }
 
     const { temperature_2m, precipitation_probability, wind_speed_10m } = weather.current;
+    // The rule is in verdict.ts. Here we only show its answer: Ride, Walk or Wait
     const verdict = getVerdict(precipitation_probability, wind_speed_10m);
+    // The saved copy of this city (it may have the user's own photo), or undefined
     const favourite = favourites.find((saved) => saved.id === selectedCity.id);
     const isFavourite = favourite !== undefined;
 
