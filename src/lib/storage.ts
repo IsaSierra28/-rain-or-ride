@@ -1,16 +1,8 @@
 import * as SQLite from "expo-sqlite";
+import { FavouriteRow, rowsToCities } from "./parsing";
 import { City } from "./types";
 
 // All the SQLite code is in this file: the screens never write SQL.
-// One row of the favourites table, as SQLite returns it (empty values come back as null)
-type FavouriteRow = {
-    id: string;
-    name: string;
-    country: string | null;
-    latitude: number;
-    longitude: number;
-    photo_uri: string | null;
-};
 
 // Open the database once and create the table the first time
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
@@ -42,14 +34,9 @@ function getDb() {
 export async function loadFavourites(): Promise<City[]> {
     const db = await getDb();
     const rows = await db.getAllAsync<FavouriteRow>("SELECT * FROM favourites ORDER BY rowid");
-    return rows.map((row) => ({
-        id: row.id,
-        name: row.name,
-        country: row.country ?? undefined,
-        latitude: row.latitude,
-        longitude: row.longitude,
-        photoUri: row.photo_uri ?? undefined,
-    }));
+    // This file has to touch the device. Turning the rows into cities does not,
+    // so that half lives in parsing.ts, where a test can reach it.
+    return rowsToCities(rows);
 }
 
 // The ? are placeholders: the values are sent separately, so user input cannot change the SQL.
